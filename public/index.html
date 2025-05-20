@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>商城管理系统</title>
+  <meta name="description" content="商城管理系统，提供便捷的商品管理、订单处理和数据分析功能。">
+  <meta name="keywords" content="商城管理系统，商品管理，订单处理，数据分析">
+  <meta name="author" content="SweelLong">
+  <meta name="copyright" content="Copyright © 2020-2025 SweelLong">
+  <link rel="icon" href="img/favicon.ico">
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <link rel="bookmark" href="img/favicon.ico">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3B82F6',
+            secondary: '#10B981',
+            accent: '#F59E0B',
+            dark: '#1E293B',
+            light: '#F8FAFC'
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .card-shadow {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      }
+      .btn-hover {
+        transition: all 0.3s ease;
+      }
+      .btn-hover:hover {
+        transform: translateY(-2px);
+      }
+      .text-gradient {
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+      }
+      .hero-bg {
+        background-image: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+      }
+    }
+    .live2d
+    {
+      position: fixed;
+      bottom : 0;
+      right : 0;
+      z-index: 9999;
+    }
+  </style>
+</head>
+
+<body id="index" class="font-inter bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+  <canvas class="live2d" id="live2d" width="400" height="300"></canvas>
+  <header class="bg-white shadow-md sticky top-0 z-50 transition-all duration-300">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <i class="fa fa-shopping-bag text-primary text-2xl"></i>
+        <h1 class="text-xl font-bold text-primary"><a href="index.html">商城管理系统</a></h1>
+      </div>
+      <nav class="hidden md:flex space-x-6">
+        <a href="#index" class="text-gray-700 hover:text-primary transition-colors duration-200">首页</a>
+        <a href="#category" class="text-gray-700 hover:text-primary transition-colors duration-200">分类</a>
+        <a href="#hot" class="text-gray-700 hover:text-primary transition-colors duration-200">精选</a>
+        <a href="#about" class="text-gray-700 hover:text-primary transition-colors duration-200">关于我们</a>
+      </nav>
+      <div class="flex items-center space-x-4">
+        <a href="login.html"
+          class="hidden md:block bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center">
+          <i class="fa fa-user mr-2"></i>管理员登录
+        </a>
+        <button class="md:hidden text-primary text-xl">
+          <i class="fa fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+  <section class="hero-bg text-white py-16 md:py-24">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2 mb-10 md:mb-0">
+          <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold leading-tight mb-6">
+            便捷的<span class="text-gradient bg-gradient-to-r from-yellow-300 to-orange-500">商城管理系统</span>
+          </h1>
+          <p class="text-lg md:text-xl mb-8 text-gray-100">
+            提供全方位的商品管理、订单处理和数据分析功能，帮助您轻松管理线上商城。
+          </p>
+          <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+            <a href="products.html"
+              class="bg-white text-primary hover:bg-gray-100 font-medium py-3 px-6 rounded-lg transition-all duration-200 btn-hover text-center">
+              浏览商品
+            </a>
+            <a href="login.html"
+              class="bg-transparent border-2 border-white text-white hover:bg-white/10 font-medium py-3 px-6 rounded-lg transition-all duration-200 btn-hover text-center">
+              管理员登录
+            </a>
+          </div>
+        </div>
+        <div class="md:w-1/2 flex justify-center">
+          <img alt="商城管理系统"
+            class="randomImg rounded-lg shadow-2xl transform transition-all duration-500 hover:scale-105 max-w-full h-auto">
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div class="p-6 rounded-xl bg-blue-50 border border-blue-100">
+          <i class="fa fa-shopping-cart text-primary text-4xl mb-4"></i>
+          <h3 class="text-3xl font-bold text-gray-800 mb-2">很多</h3>
+          <p class="text-gray-600">商品总数</p>
+        </div>
+        <div class="p-6 rounded-xl bg-green-50 border border-green-100">
+          <i class="fa fa-users text-secondary text-4xl mb-4"></i>
+          <h3 class="text-3xl font-bold text-gray-800 mb-2">不少</h3>
+          <p class="text-gray-600">注册用户</p>
+        </div>
+        <div class="p-6 rounded-xl bg-purple-50 border border-purple-100">
+          <i class="fa fa-credit-card text-purple-500 text-4xl mb-4"></i>
+          <h3 class="text-3xl font-bold text-gray-800 mb-2">很多</h3>
+          <p class="text-gray-600">订单数量</p>
+        </div>
+        <div class="p-6 rounded-xl bg-amber-50 border border-amber-100">
+          <i class="fa fa-store text-amber-500 text-4xl mb-4"></i>
+          <h3 class="text-3xl font-bold text-gray-800 mb-2">不少</h3>
+          <p class="text-gray-600">合作商家</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="category" class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-gray-800 mb-4">强大的商城管理功能</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">我们的系统提供全面的功能，帮助您轻松管理和扩展您的在线业务</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div
+          class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+          <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+            <i class="fa fa-boxes text-primary text-xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">商品管理</h3>
+          <p class="text-gray-600 mb-4">轻松添加、编辑和管理商品信息，上传商品图片，设置价格和库存。</p>
+          <a href="#about" class="text-primary hover:text-primary/80 font-medium flex items-center">
+            了解更多 <i class="fa fa-arrow-right ml-2 text-sm"></i>
+          </a>
+        </div>
+        <div
+          class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+          <div class="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
+            <i class="fa fa-shopping-basket text-secondary text-xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">订单处理</h3>
+          <p class="text-gray-600 mb-4">实时查看和处理订单，跟踪物流状态，提供优质的客户服务体验。</p>
+          <a href="#about" class="text-primary hover:text-primary/80 font-medium flex items-center">
+            了解更多 <i class="fa fa-arrow-right ml-2 text-sm"></i>
+          </a>
+        </div>
+        <div
+          class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+          <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
+            <i class="fa fa-chart-line text-amber-500 text-xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-3">数据分析</h3>
+          <p class="text-gray-600 mb-4">全面的销售数据统计和分析，帮助您了解业务状况并做出明智决策。</p>
+          <a href="#about" class="text-primary hover:text-primary/80 font-medium flex items-center">
+            了解更多 <i class="fa fa-arrow-right ml-2 text-sm"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="hot" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="flex justify-between items-center mb-10">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-gray-800">精选商城</h2>
+        <a href="products.html" class="text-primary hover:text-primary/80 font-medium flex items-center">
+          查看全部 <i class="fa fa-arrow-right ml-2"></i>
+        </a>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div
+          class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+          <div class="relative">
+            <img alt="时尚服饰" class="randomImg w-full h-48 object-cover">
+            <div class="absolute top-4 right-4 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full">
+              精选
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="font-bold text-lg text-gray-800 mb-2">时尚服饰商城</h3>
+            <p class="text-gray-600 text-sm mb-4">提供最新款式的男女服装、鞋履和配饰，满足您的时尚需求。</p>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500 text-sm">
+                <i class="fa fa-store mr-1"></i>多件商品
+              </span>
+              <a href="products.html" class="text-primary hover:text-primary/80 font-medium">
+                访问商城
+              </a>
+            </div>
+          </div>
+        </div>
+        <div
+          class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+          <div class="relative">
+            <img alt="电子产品" class="randomImg w-full h-48 object-cover">
+            <div class="absolute top-4 right-4 bg-secondary text-white text-xs font-bold px-3 py-1 rounded-full">
+              新品
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="font-bold text-lg text-gray-800 mb-2">电子产品商城</h3>
+            <p class="text-gray-600 text-sm mb-4">各种电子设备和配件，品质保证，价格优惠。</p>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500 text-sm">
+                <i class="fa fa-store mr-1"></i>多件商品
+              </span>
+              <a href="products.html" class="text-primary hover:text-primary/80 font-medium">
+                访问商城
+              </a>
+            </div>
+          </div>
+        </div>
+        <div
+          class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+          <div class="relative">
+            <img alt="家居用品" class="randomImg w-full h-48 object-cover">
+          </div>
+          <div class="p-6">
+            <h3 class="font-bold text-lg text-gray-800 mb-2">家居用品商城</h3>
+            <p class="text-gray-600 text-sm mb-4">各种高品质家居装饰品和日常用品，打造温馨舒适的家。</p>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500 text-sm">
+                <i class="fa fa-store mr-1"></i>多件商品
+              </span>
+              <a href="products.html" class="text-primary hover:text-primary/80 font-medium">
+                访问商城
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="about" class="py-16 bg-primary text-white">
+    <div class="container mx-auto px-4">
+      <div class="max-w-3xl mx-auto text-center">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-6">注册成为我们的商家</h2>
+        <p class="text-lg mb-8 text-gray-100">加入我们的平台，开启您的电商之旅。我们提供全方位的支持和服务，帮助您的业务蓬勃发展。</p>
+        <a href="login.html"
+          class="bg-white text-primary hover:bg-gray-100 font-medium py-3 px-8 rounded-lg transition-all duration-200 inline-block btn-hover">
+          立即注册
+        </a>
+      </div>
+    </div>
+  </section>
+  <footer class="bg-dark text-white py-10">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <h3 class="text-lg font-bold mb-4">商城管理系统</h3>
+          <p class="text-gray-400">提供优质商品和便捷购物体验</p>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold mb-4">快速链接</h3>
+          <ul class="space-y-2">
+            <li><a href="#index" class="text-gray-400 hover:text-white transition-colors duration-200">首页</a></li>
+            <li><a href="#category" class="text-gray-400 hover:text-white transition-colors duration-200">分类</a></li>
+            <li><a href="#hot" class="text-gray-400 hover:text-white transition-colors duration-200">精选</a></li>
+            <li><a href="#about" class="text-gray-400 hover:text-white transition-colors duration-200">关于我们</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold mb-4">联系我们</h3>
+          <ul class="space-y-2">
+            <li class="flex items-center">
+              <i class="fa fa-map-marker mr-2 text-gray-400"></i>
+              <span class="text-gray-400">福建省</span>
+            </li>
+            <li class="flex items-center">
+              <i class="fa fa-envelope mr-2 text-gray-400"></i>
+              <span class="text-gray-400">sweellong@foxmail.com</span>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold mb-4">关注我们</h3>
+          <div class="flex space-x-4">
+            <a href="https://im.qq.com/index/" class="text-gray-400 hover:text-white transition-colors duration-200">
+              <img src="./img/QQ.png" alt="前往QQ主页">
+            </a>
+            <a href="https://github.com/SweelLong"
+              class="text-gray-400 hover:text-white transition-colors duration-200">
+              <img src="./img/Github.png" alt="前往GitHub主页">
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+        <p>Powered by 2025 ShopEase. SweelLong. </p>
+      </div>
+    </div>
+  </footer>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      imgElements = document.getElementsByClassName("randomImg");
+      for (let i = 0; i < imgElements.length; i++) {
+        imgElements[i].src = "./img/bg/" + Math.floor(Math.random() * 51) + ".jpg";
+      }
+    });
+    window.addEventListener('scroll', () => {
+      const header = document.querySelector('header');
+      if (window.scrollY > 50) {
+        header.classList.add('py-2');
+        header.classList.add('shadow-lg');
+      } else {
+        header.classList.remove('py-2');
+        header.classList.remove('shadow-lg');
+      }
+    });
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        if (targetId === '#') return;
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+          targetElement.scrollIntoView({
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+  </script>
+    <script src="js/live2d.js"></script>
+    <script>
+       var LAppDefine = 
+       {
+        CANVAS_ID: "live2d",
+        IS_DRAGABLE: true
+       };
+       this.canvas = document.getElementById(LAppDefine.CANVAS_ID);
+       if (this.canvas.addEventListener)
+       {
+            this.canvas.addEventListener("click", mouseEvent, false);
+            this.canvas.addEventListener("mousedown", mouseEvent, false);
+            this.canvas.addEventListener("mouseup", mouseEvent, false);
+            this.canvas.addEventListener("mousemove", mouseEvent, false);
+        }
+        var isDragging = false;
+        var mouseOffsetx = 0;
+        var mouseOffsety = 0;
+        function mouseEvent(e)
+        {
+            e.preventDefault();
+            if (e.type == "mousedown")
+            {
+                if ("button" in e && e.button != 0){
+                    return;
+                }
+                isDragging = true;
+                mouseOffsetx = e.pageX - document.getElementById(LAppDefine.CANVAS_ID).offsetLeft;
+                mouseOffsety = e.pageY - document.getElementById(LAppDefine.CANVAS_ID).offsetTop;
+            }
+            else if (e.type == "mousemove")
+            {
+                if(isDragging == true) {
+                    var movex = e.pageX - mouseOffsetx;
+                    var movey = e.pageY - mouseOffsety;
+                    if(movex > window.innerWidth - document.getElementById(LAppDefine.CANVAS_ID).width)
+                        movex = window.innerWidth - document.getElementById(LAppDefine.CANVAS_ID).width;
+                    if(movex < 0) movex = 0;
+                    if(movey > window.innerHeight - document.getElementById(LAppDefine.CANVAS_ID).height)
+                        movey = window.innerHeight - document.getElementById(LAppDefine.CANVAS_ID).height;
+                    if(movey < 0) movey = 0;
+                    if(LAppDefine.IS_DRAGABLE) {
+                        document.getElementById(LAppDefine.CANVAS_ID).style.left = movex + "px";
+                        document.getElementById(LAppDefine.CANVAS_ID).style.top = movey + "px";
+                    }
+                }
+            }
+            else if (e.type == "mouseup")
+            {
+                if ("button" in e && e.button != 0) return;
+                isDragging = false;
+            }
+        }
+        loadlive2d("live2d", "Pio_live2d/model" + Math.floor(Math.random() * 6) + ".json");
+    </script>
+</body>
+
+</html>

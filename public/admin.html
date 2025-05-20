@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>商城管理系统 - 管理后台</title>
+  <meta name="description" content="商城管理系统，提供便捷的商品管理、订单处理和数据分析功能。">
+  <meta name="keywords" content="商城管理系统，商品管理，订单处理，数据分析">
+  <meta name="author" content="SweelLong">
+  <meta name="copyright" content="Copyright © 2020-2025 SweelLong">
+  <link rel="icon" href="img/favicon.ico">
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <link rel="bookmark" href="img/favicon.ico">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+  <style>
+    /* 继承参考页面的自定义样式 */
+    @layer utilities {
+      .card-shadow {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      }
+
+      .btn-hover {
+        transition: all 0.3s ease;
+      }
+
+      .btn-hover:hover {
+        transform: translateY(-2px);
+      }
+
+      h1,
+      #header_icon {
+        color: rgb(22 93 255) !important;
+        /* 蓝色字体 */
+      }
+    }
+
+    .sidebar-active {
+      background-color: #e3f2fd;
+      /* 浅蓝色背景 */
+      border-left: 4px solid #1a73e8;
+      /* 左侧蓝色边框 */
+      box-shadow: inset 2px 0 5px rgba(26, 115, 232, 0.1);
+      /* 内阴影增强立体感 */
+    }
+        .live2d
+    {
+      position: fixed;
+      bottom : 0;
+      right : 0;
+      z-index: 9999;
+    }
+  </style>
+</head>
+
+<body class="font-inter bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+    <canvas class="live2d" id="live2d" width="400" height="300"></canvas>
+  <!-- 固定顶部导航栏 -->
+  <header class="bg-white shadow-md sticky top-0 z-50">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <i id="header_icon" class="fa fa-shopping-bag text-primary-500 text-2xl"></i>
+        <h1 class="text-xl font-bold text-primary-500"><a href="index.html">商城管理系统</a></h1>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-4">
+          <div id="userInfo" class="flex items-center space-x-4">
+            <span id="username" class="text-gray-700 font-medium">加载中...</span>
+            <img id="avatar" src="img/avatar/default.png" alt="头像"
+              class="w-10 h-10 rounded-full object-cover border-2 border-gray-200">
+          </div>
+          <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg btn-hover" onclick="logout()">
+            <i class="fa fa-sign-out-alt mr-2"></i> 退出登录
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+  <!-- 主内容容器 -->
+  <div class="flex flex-1 overflow-hidden">
+    <!-- 左侧导航栏 -->
+    <aside
+      class="w-64 bg-white border-r border-neutral-200 flex-shrink-0 hidden md:block transition-all duration-300 fixed top-16 left-0 h-[calc(100vh-4rem)] overflow-y-auto z-20">
+
+      <!-- 导航菜单 -->
+      <div class="p-4 space-y-2">
+        <ul class="space-y-3">
+          <!-- 导航项模板（统一优化样式） -->
+          <li onclick="loadDashboard()"
+            class="flex items-center px-4 py-2 rounded-md hover:bg-blue-50 active:bg-blue-100 transition-colors hover:cursor-pointer">
+            <i class="fa fa-tachometer-alt text-blue-500 mr-4"></i>
+            <span class="text-gray-800 font-medium">仪表盘</span>
+          </li>
+
+          <li onclick="loadProducts()"
+            class="flex items-center px-4 py-2 rounded-md hover:bg-blue-50 active:bg-blue-100 transition-colors hover:cursor-pointer">
+            <i class="fa fa-shopping-cart text-blue-500 mr-4"></i>
+            <span class="text-gray-800 font-medium">商品管理</span>
+          </li>
+
+          <li onclick="loadOrders()"
+            class="flex items-center px-4 py-2 rounded-md hover:bg-blue-50 active:bg-blue-100 transition-colors hover:cursor-pointer">
+            <i class="fa fa-box-open text-blue-500 mr-4"></i>
+            <span class="text-gray-800 font-medium">订单管理</span>
+          </li>
+
+          <li onclick="loadUsers()"
+            class="flex items-center px-4 py-2 rounded-md hover:bg-blue-50 active:bg-blue-100 transition-colors hover:cursor-pointer">
+            <i class="fa fa-users text-blue-500 mr-4"></i>
+            <span class="text-gray-800 font-medium">用户管理</span>
+          </li>
+
+          <li onclick="loadInfos()"
+            class="flex items-center px-4 py-2 rounded-md hover:bg-blue-50 active:bg-blue-100 transition-colors hover:cursor-pointer">
+            <i class="fa fa-history text-blue-500 mr-4"></i>
+            <span class="text-gray-800 font-medium">操作日志</span>
+          </li>
+
+          <li onclick="loadSettings()"
+            class="flex items-center px-4 py-2 rounded-md hover:bg-blue-50 active:bg-blue-100 transition-colors hover:cursor-pointer">
+            <i class="fa fa-cog text-blue-500 mr-4"></i>
+            <span class="text-gray-800 font-medium">个人设置</span>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- 主内容区域 -->
+    <main class="flex-1 p-6 bg-gray-50flex-1 md:ml-64 transition-all duration-300">
+      <div id="content"
+        class="space-y-6container mx-auto px-4 sm:px-6 lg:px-8 py-6bg-white rounded-xl shadow-sm p-4 border border-neutral-200">
+        <!-- 动态内容加载区域 -->
+      </div>
+    </main>
+  </div>
+  <!-- 模态框模板（可根据需要扩展） -->
+  <div id="modal" class="fixed inset-0 bg-black/50 z-100 hidden">
+    <div class="flex items-center justify-center min-h-screen">
+      <div class="bg-white rounded-lg p-8 shadow-2xl w-full max-w-2xl">
+        <button class="absolute top-4 right-4 text-gray-500 hover:text-gray-700" onclick="closeModal()">
+          <i class="fa fa-xmark text-2xl"></i>
+        </button>
+        <div id="modal-content"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    let currentAdmin = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const response = await fetch('/api/admin');
+        const data = await response.json();
+
+        if (data.success) {
+          currentAdmin = data.user;
+          document.getElementById('username').textContent = `${currentAdmin.lastname}${currentAdmin.firstname} (${currentAdmin.phone})`;
+          if (currentAdmin.avatar) {
+            document.getElementById('avatar').src = `img/avatar/${currentAdmin.avatar}`;
+          }
+          loadDashboard();
+        } else {
+          alert('请先登录');
+          window.location.href = 'login.html';
+        }
+      } catch (error) {
+        console.error(error);
+        alert('获取用户信息失败');
+        window.location.href = 'login.html';
+      }
+    });
+
+    let activeItem = null;
+    async function loadDashboard() {
+      try {
+        const response = await fetch('/api/dashboard');
+        const data = await response.json();
+
+        if (data.success) {
+          const dashboard = data.dashboard;
+          document.getElementById('content').innerHTML = `
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">仪表盘</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="bg-blue-50 border border-blue-100 rounded-lg p-6 card-shadow">
+            <h3 class="text-lg font-medium text-blue-500 mb-4">总销售额</h3>
+            <p class="text-3xl font-bold text-gray-900">¥${parseFloat(dashboard.totalSales).toFixed(2)}</p>
+          </div>
+          <div class="bg-green-50 border border-green-100 rounded-lg p-6 card-shadow">
+            <h3 class="text-lg font-medium text-green-500 mb-4">总订单数</h3>
+            <p class="text-3xl font-bold text-gray-900">${dashboard.orderCount}</p>
+          </div>
+          <div class="bg-purple-50 border border-purple-100 rounded-lg p-6 card-shadow">
+            <h3 class="text-lg font-medium text-purple-500 mb-4">用户数</h3>
+            <p class="text-3xl font-bold text-gray-900">${dashboard.userCount}</p>
+          </div>
+          <div class="bg-yellow-50 border border-yellow-100 rounded-lg p-6 card-shadow">
+            <h3 class="text-lg font-medium text-yellow-500 mb-4">库存剩余数</h3>
+            <p class="text-3xl font-bold text-gray-900">${dashboard.totalStock}</p>
+          </div>
+        </div>
+        <div id="recentInfos" class="bg-white rounded-lg p-6 card-shadow overflow-y-auto top-6 mt-6">
+          <h3 class="text-lg font-medium text-gray-700 mb-4">最近操作</h3>
+          <div id="recentInfosContent" class="space-y-4">
+            <!-- 动态加载的日志项 -->
+          </div>
+        </div>
+      `;
+
+          // 加载最近操作日志
+          loadRecentInfos();
+        } else {
+          document.getElementById('content').innerHTML = '<h2>仪表盘</h2><p>获取数据失败</p>';
+        }
+      } catch (error) {
+        console.error(error);
+        document.getElementById('content').innerHTML = '<h2>仪表盘</h2><p>加载数据失败</p>';
+      }
+      if (activeItem) {
+        activeItem.classList.remove('sidebar-active');
+      }
+      const dashboardItem = document.querySelector('li[onclick="loadDashboard()"]');
+      dashboardItem.classList.add('sidebar-active');
+      activeItem = dashboardItem;
+    }
+
+    async function loadRecentInfos() {
+      try {
+        const response = await fetch('/api/infos');
+        const data = await response.json();
+
+        if (data.success && data.infos.length > 0) {
+          const recentInfosContent = document.getElementById('recentInfosContent');
+          recentInfosContent.innerHTML = '';
+
+          const recentLogs = data.infos.slice(0, 5);
+
+          recentLogs.forEach(info => {
+            const logItem = document.createElement('div');
+            logItem.className = "bg-gray-50 rounded-lg p-4 shadow-sm flex space-x-4";
+
+            // 可根据不同操作类型添加不同颜色图标（需引入font-awesome图标库）
+            let iconClass = "fa-solid fa-circle-info text-blue-500";
+            if (info.type === '商品') iconClass = "fa-solid fa-box text-green-500";
+            else if (info.type === '订单') iconClass = "fa-solid fa-file-invoice text-yellow-500";
+            else if (info.type === '用户') iconClass = "fa-solid fa-users text-purple-500";
+
+            logItem.innerHTML = `
+            <div class="flex-shrink-0">
+              <i class="${iconClass} text-lg"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-medium">${info.action}</p>
+              <p class="text-xs text-gray-600">
+                ${info.detail} <br>
+                <span class="text-xs text-gray-400">${new Date(info.create_time).toLocaleString()}</span>
+              </p>
+            </div>
+          `;
+
+            recentInfosContent.appendChild(logItem);
+          });
+        } else {
+          recentInfosContent.innerHTML = '<p class="text-sm text-gray-600">暂无最近操作</p>';
+        }
+      } catch (error) {
+        console.error(error);
+        document.getElementById('recentInfosContent').innerHTML = '<p>加载日志失败</p>';
+      }
+    }
+    async function loadProducts() {
+      try {
+        const response = await fetch(`/api/products?adminPhone=${currentAdmin.phone}`);
+        const data = await response.json();
+
+        document.getElementById('content').innerHTML = `
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">商品管理</h2>
+        <button onclick="showAddProductForm()" class="bg-blue-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg btn-hover">
+          <i class="fa fa-plus mr-2"></i>添加商品
+        </button>
+        
+        <div id="productList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          ${data.success ? data.products.map(product => `
+            <div class="bg-white rounded-lg p-6 card-shadow">
+              <img src="img/product/${product.image}" alt="${product.name}" class="w-full h-48 object-cover">
+              <h4 class="text-lg font-bold text-gray-800 mb-2">${product.name}</h4>
+              <p class="text-gray-600 mb-1">价格: <span class="text-primary-500">¥${product.price}</span></p>
+              <p class="text-gray-600 mb-4">库存: ${product.stock}</p>
+              <p class="text-sm text-gray-500 mb-4">${product.info}</p>
+              <div class="flex space-x-2">
+                <button onclick="showEditProductForm(${product.id})" class="bg-blue-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg btn-hover">
+                  <i class="fa fa-pen"></i> 编辑
+                </button>
+                <button onclick="deleteProduct(${product.id})" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg btn-hover">
+                  <i class="fa fa-trash"></i> 删除
+                </button>
+              </div>
+            </div>
+          `).join('') : '<p class="text-gray-600">暂无商品</p>'}
+        </div>
+
+        <div id="addProductForm" class="bg-white rounded-lg p-6 card-shadow hidden">
+          <!-- 添加商品表单，使用Tailwind表单样式 -->
+        </div>
+      `;
+      } catch (error) {
+        console.error(error);
+        document.getElementById('content').innerHTML = '<h2>商品管理</h2><p>加载商品失败</p>';
+      }
+      if (activeItem) {
+        activeItem.classList.remove('sidebar-active');
+      }
+      const dashboardItem = document.querySelector('li[onclick="loadProducts()"]');
+      dashboardItem.classList.add('sidebar-active');
+      activeItem = dashboardItem;
+    }
+
+    function logout() {
+      document.cookie = 'phone=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      document.cookie = 'password=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      window.location.href = 'index.html';
+    }
+
+    function showAddProductForm() {
+      // 生成表单 HTML
+      const formHtml = `
+    <h3 class="text-xl font-bold text-gray-800 mb-4">添加商品</h3>
+    <form id="productForm" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">商品名称 <span class="text-red-500">*</span></label>
+          <input type="text" id="productName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">价格 (¥) <span class="text-red-500">*</span></label>
+          <input type="number" id="productPrice" step="0.01" min="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" required>
+        </div>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">商品描述</label>
+        <textarea id="productInfo" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"></textarea>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">库存数量 <span class="text-red-500">*</span></label>
+        <input type="number" id="productStock" min="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" required>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">商品图片 <span class="text-red-500">*</span></label>
+        <div class="flex items-center space-x-4">
+          <div class="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+            <img id="imagePreview" src="https://picsum.photos/100/100" alt="预览图" class="w-full h-full object-cover rounded-lg hidden">
+            <span id="noImageText" class="text-gray-400">暂无图片</span>
+          </div>
+          <input type="file" id="productImage" accept="image/*" class="hidden" required>
+          <button type="button" onclick="document.getElementById('productImage').click()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg btn-hover">
+            <i class="fa fa-upload mr-2"></i> 选择图片
+          </button>
+        </div>
+      </div>
+      
+      <div class="flex space-x-4">
+        <button type="button" onclick="addProduct()" class="bg-blue-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg btn-hover">
+          <i class="text-red-500 fa fa-save mr-2"></i> 保存
+        </button>
+        <button type="button" onclick="document.getElementById('addProductForm').style.display = 'none'" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg btn-hover">
+          <i class="fa fa-times mr-2"></i> 取消
+        </button>
+      </div>
+    </form>
+  `;
+
+      // 设置表单内容并显示
+      document.getElementById('addProductForm').innerHTML = formHtml;
+      document.getElementById('addProductForm').style.display = 'block';
+
+      // 添加图片预览功能
+      document.getElementById('productImage').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            document.getElementById('imagePreview').src = event.target.result;
+            document.getElementById('imagePreview').classList.remove('hidden');
+            document.getElementById('noImageText').classList.add('hidden');
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
+    async function addProduct() {
+      const name = document.getElementById('productName').value.trim();
+      const info = document.getElementById('productInfo').value.trim();
+      const price = parseFloat(document.getElementById('productPrice').value);
+      const stock = parseInt(document.getElementById('productStock').value);
+      const image = document.getElementById('productImage').files[0];
+
+      // 基本表单验证
+      if (!name) {
+        alert('请输入商品名称');
+        return;
+      }
+
+      if (isNaN(price) || price <= 0) {
+        alert('请输入有效的价格');
+        return;
+      }
+
+      if (isNaN(stock) || stock < 0) {
+        alert('请输入有效的库存数量');
+        return;
+      }
+
+      if (!image) {
+        alert('请选择商品图片');
+        return;
+      }
+
+      // 显示加载状态
+      const submitBtn = document.querySelector('#addProductForm button:first-of-type');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i> 上传中...';
+
+      try {
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('info', info);
+        formData.append('price', price);
+        formData.append('stock', stock);
+        formData.append('image', image);
+
+        const response = await fetch('/api/addProduct', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          alert('添加成功');
+          document.getElementById('addProductForm').style.display = 'none';
+          await loadProducts(true); // 强制刷新商品列表
+        } else {
+          alert(data.message || '添加失败，请重试');
+        }
+      } catch (error) {
+        console.error('添加商品失败:', error);
+        alert('网络错误，请重试');
+      } finally {
+        // 恢复按钮状态
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+    }
+
+    function showEditProductForm(productId) {
+      fetch(`/api/products/${productId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.success) throw new Error(data.message);
+          const product = data.product;
+
+          // 构建美化后的编辑表单
+          const formHtml = `
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">编辑商品</h2>
+        <div class="bg-white rounded-lg p-6 card-shadow">
+          <form id="editProductForm" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">商品名称 <span class="text-red-500">*</span></label>
+                <input type="text" id="editName" value="${product.name}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" required>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">价格 (¥) <span class="text-red-500">*</span></label>
+                <input type="number" id="editPrice" value="${product.price}" step="0.01" min="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" required>
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">商品描述</label>
+              <textarea id="editInfo" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">${product.info || ''}</textarea>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">库存数量 <span class="text-red-500">*</span></label>
+              <input type="number" id="editStock" value="${product.stock}" min="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" required>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">商品图片</label>
+              <div class="flex flex-col md:flex-row items-start space-x-4">
+                <div class="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mb-4 md:mb-0">
+                  <img id="editImagePreview" src="img/product/${product.image}" alt="当前图片" class="w-full h-full object-cover rounded-lg">
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500 mb-2">当前图片</p>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">更新图片 (可选)</label>
+                  <input type="file" id="editImage" accept="image/*" class="hidden">
+                  <button type="button" onclick="document.getElementById('editImage').click()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg btn-hover">
+                    <i class="fa fa-upload mr-2"></i> 选择新图片
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="flex space-x-4 pt-4 border-t border-gray-200">
+              <button type="button" onclick="updateProduct(${productId})" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg btn-hover">
+                <i class="fa fa-save mr-2"></i> 保存修改
+              </button>
+              <button type="button" onclick="loadProducts()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg btn-hover">
+                <i class="fa fa-times mr-2"></i> 取消
+              </button>
+            </div>
+          </form>
+        </div>
+      `;
+
+          document.getElementById('content').innerHTML = formHtml;
+
+          // 添加图片预览功能
+          document.getElementById('editImage').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = function (event) {
+                document.getElementById('editImagePreview').src = event.target.result;
+              };
+              reader.readAsDataURL(file);
+            }
+          });
+        })
+        .catch(err => {
+          console.error(err);
+          alert('加载商品信息失败');
+          loadProducts(); // 加载失败时返回商品列表
+        });
+    }
+
+    async function updateProduct(productId) {
+      const name = document.getElementById('editName').value.trim();
+      const info = document.getElementById('editInfo').value.trim();
+      const price = parseFloat(document.getElementById('editPrice').value);
+      const stock = parseInt(document.getElementById('editStock').value);
+      const image = document.getElementById('editImage').files[0];
+
+      // 基本表单验证
+      if (!name) {
+        alert('请输入商品名称');
+        return;
+      }
+
+      if (isNaN(price) || price <= 0) {
+        alert('请输入有效的价格');
+        return;
+      }
+
+      if (isNaN(stock) || stock < 0) {
+        alert('请输入有效的库存数量');
+        return;
+      }
+
+      // 显示加载状态
+      const submitBtn = document.querySelector('#editProductForm button:first-of-type');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i> 保存中...';
+
+      try {
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('info', info);
+        formData.append('price', price);
+        formData.append('stock', stock);
+
+        // 只有选择了新图片时才添加到表单
+        if (image) formData.append('image', image);
+
+        const response = await fetch(`/api/products/${productId}`, {
+          method: 'PUT',
+          body: formData
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          alert('商品更新成功');
+          loadProducts(); // 刷新商品列表
+        } else {
+          alert(data.message || '更新失败，请重试');
+        }
+      } catch (error) {
+        console.error('更新商品失败:', error);
+        alert('网络错误，请重试');
+      } finally {
+        // 恢复按钮状态
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+    }
+
+    async function deleteProduct(productId) {
+      if (confirm('确定要删除此商品吗？')) {
+        try {
+          const response = await fetch(`/api/products/${productId}`, {
+            method: 'DELETE'
+          });
+          const data = await response.json();
+          if (data.success) {
+            alert('商品已删除');
+            loadProducts();
+          } else {
+            alert(data.message);
+          }
+        } catch (error) {
+          console.error(error);
+          alert('删除失败');
+        }
+      }
+    }
+
+    async function loadSettings() {
+      try {
+        const response = await fetch(`/api/admin`);
+        const data = await response.json();
+
+        if (data.success) {
+          currentAdmin = data.user;
+          document.getElementById('content').innerHTML = `
+        <h2 class="text-3xl font-bold text-gray-800 mb-8">个人设置</h2>
+        
+        <!-- 小店名称设置 -->
+        <div class="bg-white rounded-lg p-6 card-shadow mb-8">
+          <h3 class="text-xl font-bold text-gray-700 mb-4">小店名称</h3>
+          <div class="flex items-center space-x-4">
+            <input type="text" id="shopName" value="${currentAdmin.shop_name || ''}" 
+              placeholder="请输入小店名称"
+              class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+            <button onclick="saveShopName()" 
+              class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg btn-hover">
+              <i class="fa fa-save mr-2"></i> 保存
+            </button>
+          </div>
+        </div>
+
+        <!-- 头像设置 -->
+        <div class="bg-white rounded-lg p-6 card-shadow mb-8">
+          <h3 class="text-xl font-bold text-gray-700 mb-6">头像设置</h3>
+          
+          <!-- 头像预览与操作 -->
+          <div class="flex items-start space-x-8">
+            <!-- 预览区域 -->
+            <div class="flex-shrink-0">
+              <div class="w-32 h-32 bg-gray-200 rounded-full overflow-hidden border-4 border-white shadow-lg">
+                <img id="currentAvatar" src="img/avatar/${currentAdmin.avatar}" 
+                  alt="当前头像" 
+                  class="w-full h-full object-cover">
+              </div>
+              <p class="text-center text-sm text-gray-500 mt-2">当前头像</p>
+            </div>
+
+            <!-- 操作区域 -->
+            <div class="flex-1">
+              <!-- 预设头像选择 -->
+              <div class="mb-6">
+                <h4 class="text-lg font-medium text-gray-700 mb-2">选择预设头像</h4>
+                <div class="relative inline-block text-left">
+                  <select id="defaultAvatarSelect" onchange="selectDefaultAvatar()" 
+                    class="w-full px-4 py-2 border rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                    <option value="">-- 选择预设头像 --</option>
+                    ${await generateDefaultAvatarOptions()}
+                  </select>
+              </div>
+              <button onclick="saveDefaultAvatar()" 
+                class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg btn-hover">
+                <li class="fa fa-save mr-2"></i> 保存 
+              </button>
+              <!-- 自定义头像上传 -->
+              <div>
+                <h4 class="text-lg font-medium text-gray-700 mb-2">或上传新头像</h4>
+                <div class="flex items-center space-x-4">
+                  <div class="w-16 h-16 bg-gray-200 rounded-full overflow-hidden border-4 border-white shadow-lg">
+                    <img id="uploadPreview" src="https://picsum.photos/100/100" 
+                      alt="预览图" 
+                      class="w-full h-full object-cover hidden">
+                    <span id="noImageText" class="text-gray-400">&nbsp;&nbsp;暂无<br>&nbsp;&nbsp;图片</span>
+                  </div>
+                  
+                  <div class="flex-1">
+                    <input type="file" id="newAvatar" accept="image/*" 
+                      class="hidden"
+                      onchange="previewAvatar(this)">
+                      
+                    <button type="button" 
+                      onclick="document.getElementById('newAvatar').click()" 
+                      class="bg-blue-500 hover:bg-blue-100 text-white px-6 py-2 rounded-lg btn-hover">
+                      <i class="fa fa-upload mr-2"></i> 上传头像
+                    </button>
+                    
+                    <button type="button" onclick="uploadAvatar()" 
+                      class="bg-blue-500 hover:bg-blue-100 text-white px-6 py-2 rounded-lg btn-hover">
+                      <i class="fa fa-cloud-upload mr-2"></i> 保存头像
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 查看店铺 -->
+        <div class="bg-white rounded-lg p-6 card-shadow">
+          <button onclick="viewMyShop()" 
+            class="w-full bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg btn-hover flex items-center justify-center space-x-2">
+            <i class="fa fa-store mr-2"></i> 查看我的店铺
+          </button>
+        </div>
+      `;
+
+          // 初始化上传预览
+          document.getElementById('newAvatar').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = (event) => {
+                document.getElementById('uploadPreview').src = event.target.result;
+                document.getElementById('uploadPreview').classList.remove('hidden');
+                document.getElementById('noImageText').classList.add('hidden');
+              };
+              reader.readAsDataURL(file);
+            }
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        document.getElementById('content').innerHTML = '<h2>个人设置</h2><p>加载失败</p>';
+      }
+      if (activeItem) {
+        activeItem.classList.remove('sidebar-active');
+      }
+      const dashboardItem = document.querySelector('li[onclick="loadSettings()"]');
+      dashboardItem.classList.add('sidebar-active');
+      activeItem = dashboardItem;
+
+    }
+    // 生成预设头像小圆点预览
+    async function generateDefaultAvatarDots() {
+      try {
+        const response = await fetch('/api/defaultAvatars');
+        const data = await response.json();
+
+        if (data.success && data.avatars.length > 0) {
+          return data.avatars.map(avatar => `
+        <span class="w-4 h-4 rounded-full border-2 border-white shadow-lg" 
+          style="background-image: url('img/avatar/${avatar}'); background-size: cover;"></span>
+      `).join('');
+        }
+        return '';
+      } catch (error) {
+        console.error(error);
+        return '';
+      }
+    }
+
+    // 优化后的头像预览函数
+    function selectDefaultAvatar() {
+      const select = document.getElementById('defaultAvatarSelect');
+      const selectedAvatar = select.value;
+
+      if (selectedAvatar) {
+        document.getElementById('currentAvatar').src = `img/avatar/${selectedAvatar}`;
+        // 滚动到选中的预设头像位置（可选）
+        const dots = document.querySelectorAll('[style*="background-image"]');
+        dots.forEach(dot => dot.classList.remove('border-primary-500'));
+        dots[select.selectedIndex - 1].classList.add('border-primary-500');
+      }
+    }
+    // 生成预设头像选项
+    async function generateDefaultAvatarOptions() {
+      try {
+        const response = await fetch('/api/defaultAvatars');
+        const data = await response.json();
+
+        if (data.success && data.avatars.length > 0) {
+          return data.avatars.map(avatar => `
+        <option value="${avatar}">${avatar}</option>
+      `).join('');
+        }
+        return '<option value="">无预设头像</option>';
+      } catch (error) {
+        console.error(error);
+        return '<option value="">加载失败</option>';
+      }
+    }
+
+    // 预览选择的预设头像
+    function selectDefaultAvatar() {
+      const select = document.getElementById('defaultAvatarSelect');
+      const selectedAvatar = select.value;
+
+      if (selectedAvatar) {
+        document.getElementById('currentAvatar').src = `img/avatar/${selectedAvatar}`;
+      }
+    }
+
+    // 保存预设头像
+    async function saveDefaultAvatar() {
+      const select = document.getElementById('defaultAvatarSelect');
+      const selectedAvatar = select.value;
+
+      if (!selectedAvatar) {
+        alert('请选择预设头像');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/setDefaultAvatar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ avatar: selectedAvatar })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          alert('头像更新成功');
+          currentAdmin.avatar = selectedAvatar;
+          document.getElementById('avatar').src = `img/avatar/${selectedAvatar}`;
+        } else {
+          alert(data.message);
+        }
+      } catch (error) {
+        console.error(error);
+        alert('更新失败');
+      }
+    }
+
+    async function saveShopName() {
+      const shopName = document.getElementById('shopName').value;
+
+      try {
+        const response = await fetch('/api/updateShopName', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ shopName })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          alert('小店名称更新成功');
+          currentAdmin.shop_name = shopName;
+        } else {
+          alert(data.message);
+        }
+      } catch (error) {
+        console.error(error);
+        alert('更新失败');
+      }
+    }
+
+    async function uploadAvatar() {
+      const fileInput = document.getElementById('newAvatar');
+      const file = fileInput.files[0];
+
+      if (!file) {
+        alert('请选择图片');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      try {
+        const response = await fetch('/api/uploadAvatar', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          alert('上传成功');
+          document.getElementById('currentAvatar').src = `img/avatar/${data.avatar}`;
+          document.getElementById('avatar').src = `img/avatar/${data.avatar}`;
+          currentAdmin.avatar = data.avatar;
+        } else {
+          alert(data.message);
+        }
+      } catch (error) {
+        console.error(error);
+        alert('上传失败');
+      }
+    }
+
+    function viewMyShop() {
+      if (currentAdmin.phone) {
+        window.location.href = `products.html?adminPhone=${encodeURIComponent(currentAdmin.phone)}`;
+      } else {
+        alert('无法获取管理员手机号码');
+      }
+    }
+    const ORDER_STATUSES = [
+      { value: '已下单', label: '已下单' },
+      { value: '已发货', label: '已发货' },
+      { value: '已完成', label: '已完成' },
+      { value: '已取消', label: '已取消' }
+    ];
+
+    async function loadOrders() {
+      try {
+        const response = await fetch('/api/orders');
+        const data = await response.json();
+
+        if (data.success) {
+          const orderList = document.createElement('div');
+          orderList.innerHTML = `
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">订单管理</h2>
+        <div class="overflow-x-auto rounded-lg shadow-md">
+          <table class="min-w-full">
+            <thead>
+              <tr class="bg-gray-50">
+                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold">订单ID</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold">用户名称</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold">商品名称</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold">价格</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold">订单时间</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold">订单状态</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold">操作</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              ${data.orders.map(order => `
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4 border-b-2 border-gray-300">${order.id}</td>
+                  <td class="px-6 py-4 border-b-2 border-gray-300">${order.user_name}</td>
+                  <td class="px-6 py-4 border-b-2 border-gray-300">${order.product_name}</td>
+                  <td class="px-6 py-4 border-b-2 border-gray-300">¥${order.price}</td>
+                  <td class="px-6 py-4 border-b-2 border-gray-300">${new Date(order.order_time).toLocaleString()}</td>
+                  <td class="px-6 py-4 border-b-2 border-gray-300">
+                    <span class="px-2 py-1 rounded-full ${getStatusColor(order.status_info)} text-${getStatusColor(order.status_info)}">
+                      ${order.status_info || '未定义'}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 border-b-2 border-gray-300">
+                    <div class="relative">
+                      <button onclick="viewOrderDetail(${order.id})" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg btn-hover">
+                      <i class="fa fa-eye mr-1"></i> 详情
+                      </button>
+                      <select id="statusSelect_${order.id}" class="border rounded-lg p-2 w-28">
+                        ${ORDER_STATUSES.map(stat => `
+                          <option value="${stat.value}" ${order.status_info === stat.value ? 'selected' : ''}>
+                            ${stat.label}
+                          </option>
+                        `).join('')}
+                      </select>
+                      <button onclick="updateOrderStatus(${order.id}, document.getElementById('statusSelect_${order.id}').value)" 
+                              class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md ml-2 btn-hover">
+                        <i class="fa fa-check"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+
+          document.getElementById('content').innerHTML = '';
+          document.getElementById('content').appendChild(orderList);
+        }
+      } catch (error) {
+        console.error(error);
+        document.getElementById('content').innerHTML = '<h2 class="text-2xl font-bold text-gray-800 mb-6">订单管理</h2><p class="text-gray-600">加载订单失败</p>';
+      }
+      if (activeItem) {
+        activeItem.classList.remove('sidebar-active');
+      }
+      const dashboardItem = document.querySelector('li[onclick="loadOrders()"]');
+      dashboardItem.classList.add('sidebar-active');
+      activeItem = dashboardItem;
+    }
+    function viewOrderDetail(orderId) {
+      fetch(`/api/orders/${orderId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.success) throw new Error(data.message);
+          const order = data.order;
+          document.getElementById('content').innerHTML = `
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">订单详情 #${order.id}</h2>
+        <div class="bg-white rounded-lg p-6 shadow-md">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <p class="text-lg font-medium text-gray-800 mb-2">用户信息</p>
+              <p class="text-gray-600 mb-1"><strong>姓名:</strong> ${order.user_name}</p>
+              <p class="text-gray-600 mb-4"><strong>手机号:</strong> ${order.phone || '未提供'}</p>
+            </div>
+            <div>
+              <p class="text-lg font-medium text-gray-800 mb-2">商品信息</p>
+              <p class="text-gray-600 mb-1"><strong>名称:</strong> ${order.product_name}</p>
+              <p class="text-gray-600 mb-1"><strong>价格:</strong> ¥${order.price}</p>
+              <p class="text-gray-600 mb-4"><strong>库存:</strong> ${order.stock || '无库存'}</p>
+            </div>
+          </div>
+          <div class="mt-6 border-t border-gray-200 pt-6">
+            <p class="text-lg font-medium text-gray-800 mb-2">订单信息</p>
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-1">当前状态:</label>
+              <input id="orderStatus" class="mt-1 block w-full border rounded-lg p-2" value="${order.status_info}" disabled>
+              </input>
+            </div>
+            <button onclick="loadOrders()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg btn-hover">
+              <i class="fa fa-arrow-left mr-2"></i> 返回订单列表
+            </button>
+          </div>
+        </div>
+      `;
+        })
+        .catch(err => {
+          console.error(err);
+          alert('加载订单详情失败');
+        });
+    }
+    async function saveOrderStatus(orderId, newStatus) {
+      try {
+        const response = await fetch(`/api/orders/${orderId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status_info: newStatus })
+        });
+        const data = await response.json();
+        if (data.success) {
+          alert('订单状态更新成功');
+          loadOrders(); // 刷新订单列表
+        } else {
+          alert(data.message);
+        }
+      } catch (error) {
+        console.error(error);
+        alert('更新状态失败，请重试');
+      }
+    }
+
+    function getStatusColor(status) {
+      switch (status) {
+        case '已下单': return 'blue-500';
+        case '已发货': return 'green-500';
+        case '已完成': return 'teal-500';
+        case '已取消': return 'red-500';
+        default: return 'gray-500';
+      }
+    }
+    async function updateOrderStatus(orderId) {
+      const status = document.getElementById(`statusSelect_${orderId}`).value;
+      if (!status) return;
+
+      try {
+        const response = await fetch(`/api/orders/${orderId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status })
+        });
+        const data = await response.json();
+        if (data.success) {
+          alert('订单状态已更新：' + status);
+          loadOrders();
+        } else {
+          alert(data.message);
+        }
+      } catch (error) {
+        console.error(error);
+        alert('更新失败');
+      }
+    }
+
+    async function loadUsers() {
+      try {
+        const response = await fetch('/api/users');
+        const data = await response.json();
+
+        document.getElementById('content').innerHTML = `
+      <h2 class="text-2xl font-bold text-gray-800 mb-6">用户管理</h2>
+      <div class="flex items-center justify-between mb-6">
+        <button onclick="showAddUserForm()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg btn-hover">
+          <i class="fa fa-plus mr-2"></i> 添加用户
+        </button>
+      </div>
+
+      <div class="bg-white rounded-lg p-6 card-shadow overflow-x-auto">
+        ${data.success && data.users.length > 0 ? `
+          <table class="min-w-full bg-white">
+            <thead>
+              <tr>
+                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold">用户ID</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold">邮箱</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold">姓名</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold">手机号</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm font-semibold">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.users.map(user => `
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4 border-b border-gray-200">${user.id}</td>
+                  <td class="px-6 py-4 border-b border-gray-200">${user.email}</td>
+                  <td class="px-6 py-4 border-b border-gray-200">${user.name}</td>
+                  <td class="px-6 py-4 border-b border-gray-200">${user.phone}</td>
+                  <td class="px-6 py-4 border-b border-gray-200 flex space-x-2">
+                    <button onclick="editUser(${user.id})" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-md btn-hover">
+                      <i class="fa fa-pen text-sm fa-color-white"></i>
+                    </button>
+                    <button onclick="deleteUser(${user.id})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-md btn-hover">
+                      <i class="fa fa-trash text-sm"></i>
+                    </button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        ` : `
+          <p class="text-gray-600 text-center py-10">暂无用户数据</p>
+        `}
+      </div>
+
+      <!-- 添加用户表单 -->
+      <div id="addUserForm" class="mt-6 bg-white rounded-lg p-6 card-shadow hidden">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">添加用户</h3>
+        <form id="userForm" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">邮箱 <span class="text-red-500">*</span></label>
+              <input type="email" id="userEmail" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">密码 <span class="text-red-500">*</span></label>
+              <input type="password" id="userPassword" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">姓名 <span class="text-red-500">*</span></label>
+              <input type="text" id="userName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">手机号 <span class="text-red-500">*</span></label>
+              <input type="text" id="userPhone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+            </div>
+          </div>
+          
+          <div class="flex justify-end">
+            <button type="button" onclick="addUser()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg btn-hover">
+              <i class="fa fa-save mr-2"></i> 提交
+            </button>
+            <button type="button" onclick="document.getElementById('addUserForm').style.display = 'none'" class="ml-4 bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg btn-hover">
+              <i class="fa fa-times mr-2"></i> 取消
+            </button>
+          </div>
+        </form>
+      </div>
+    `;
+      } catch (error) {
+        console.error(error);
+        document.getElementById('content').innerHTML = '<h2>用户管理</h2><p>加载用户失败</p>';
+      }
+      if (activeItem) {
+        activeItem.classList.remove('sidebar-active');
+      }
+      const dashboardItem = document.querySelector('li[onclick="loadUsers()"]');
+      dashboardItem.classList.add('sidebar-active');
+      activeItem = dashboardItem;
+
+    }
+    function showAddUserForm() {
+      document.getElementById('addUserForm').style.display = 'block';
+    }
+
+    async function addUser() {
+      const email = document.getElementById('userEmail').value;
+      const password = document.getElementById('userPassword').value;
+      const name = document.getElementById('userName').value;
+      const phone = document.getElementById('userPhone').value;
+
+      try {
+        const response = await fetch('/api/registerUser', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            adminPhone: currentAdmin.phone,
+            email,
+            password,
+            name,
+            phone
+          })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          alert('用户添加成功');
+          loadUsers();
+        } else {
+          alert(data.message);
+        }
+      } catch (error) {
+        console.error(error);
+        alert('添加失败');
+      }
+    }
+
+    async function editUser(userId) {
+      try {
+        const response = await fetch(`/api/users/${userId}`);
+        const { success, user, message } = await response.json();
+
+        if (!success) throw new Error(message);
+
+        document.getElementById('content').innerHTML = `
+      <div class="max-w-2xl mx-auto mt-6">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 transition-all duration-300 hover:shadow-lg">
+          <div class="bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center">
+              <i class="fa fa-user-edit mr-2"></i> 编辑用户信息
+            </h2>
+          </div>
+          
+          <div class="p-6 space-y-6">
+            <form id="editUserForm" class="space-y-5">
+              <div class="grid md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                  <label class="block text-sm font-medium text-gray-700">
+                    <i class="fa fa-envelope-o mr-1"></i> 邮箱地址
+                  </label>
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <i class="fa fa-at text-gray-400"></i>
+                    </div>
+                    <input 
+                      type="email" 
+                      id="editEmail" 
+                      value="${user.email}" 
+                      class="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                      required
+                    >
+                  </div>
+                </div>
+                
+                <div class="space-y-2">
+                  <label class="block text-sm font-medium text-gray-700">
+                    <i class="fa fa-user mr-1"></i> 姓名
+                  </label>
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <i class="fa fa-user-o text-gray-400"></i>
+                    </div>
+                    <input 
+                      type="text" 
+                      id="editName" 
+                      value="${user.name}" 
+                      class="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                      required
+                    >
+                  </div>
+                </div>
+              </div>
+              
+              <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">
+                  <i class="fa fa-phone mr-1"></i> 手机号
+                </label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fa fa-phone text-gray-400"></i>
+                  </div>
+                  <input 
+                    type="text" 
+                    id="editPhone" 
+                    value="${user.phone}" 
+                    class="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    required
+                  >
+                </div>
+              </div>
+              
+              <div class="flex justify-end space-x-3 pt-2">
+                <button 
+                  type="button" 
+                  onclick="loadUsers()"
+                  class="px-4 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-lg transition-all duration-200 flex items-center"
+                >
+                  <i class="fa fa-times mr-2"></i> 取消
+                </button>
+                <button 
+                  type="button" 
+                  onclick="saveUser(${userId})"
+                  class="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium rounded-lg transition-all duration-200 flex items-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                >
+                  <i class="fa fa-save mr-2"></i> 保存修改
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    `;
+      } catch (error) {
+        console.error('加载用户信息失败:', error);
+        showToast('加载用户信息失败', 'error');
+      }
+    }
+
+    async function deleteUser(userId) {
+      if (confirm('确定要删除此用户吗？')) {
+        try {
+          const response = await fetch(`/api/users/${userId}`, {
+            method: 'DELETE'
+          });
+          const data = await response.json();
+          if (data.success) {
+            alert('用户已删除');
+            loadUsers();
+          } else {
+            alert(data.message);
+          }
+        } catch (error) {
+          console.error(error);
+          alert('删除失败');
+        }
+      }
+    }
+
+    function viewInfoDetail(infoId) {
+      fetch(`/api/infos/${infoId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.success) throw new Error(data.message);
+          const info = data.info;
+          document.getElementById('content').innerHTML = `
+          <div class="bg-white rounded-lg p-8 card-shadow">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">日志详情 #${info.id}</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div>
+                <p class="text-sm font-medium text-gray-700 mb-2">类型</p>
+                <p class="text-gray-600">${info.type}</p>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-700 mb-2">操作时间</p>
+                <p class="text-gray-600">${new Date(info.create_time).toLocaleString()}</p>
+              </div>
+            </div>
+            <div class="border-t border-gray-200 pt-6">
+              <p class="text-sm font-medium text-gray-700 mb-4">操作详情</p>
+              <p class="text-gray-600">${info.detail}</p>
+              <button onclick="loadInfos()" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg btn-hover">
+                <i class="fa-solid fa-arrow-left mr-2"></i> 返回日志列表
+              </button>
+            </div>
+          </div>
+        `;
+        })
+        .catch(err => {
+          console.error(err);
+          alert('加载日志详情失败');
+        });
+    }
+
+    async function loadInfos() {
+      try {
+        const response = await fetch('/api/infos');
+        const data = await response.json();
+
+        if (data.success) {
+          const infoList = document.createElement('div');
+          infoList.innerHTML = `
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">操作日志</h2>
+          <div class="overflow-x-auto">
+            <table class="min-w-full bg-white rounded-lg shadow-md">
+              <thead>
+                <tr>
+                  <th class="px-6 py-3 border-b-2 border-gray-300 text-sm font-semibold text-left text-gray-700">日志ID</th>
+                  <th class="px-6 py-3 border-b-2 border-gray-300 text-sm font-semibold text-left text-gray-700">类型</th>
+                  <th class="px-6 py-3 border-b-2 border-gray-300 text-sm font-semibold text-left text-gray-700">操作</th>
+                  <th class="px-6 py-3 border-b-2 border-gray-300 text-sm font-semibold text-left text-gray-700">详情</th>
+                  <th class="px-6 py-3 border-b-2 border-gray-300 text-sm font-semibold text-left text-gray-700">时间</th>
+                  <th class="px-6 py-3 border-b-2 border-gray-300 text-sm font-semibold text-left text-gray-700">操作</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                ${data.infos.map(info => `
+                  <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">${info.id}</td>
+                    <td class="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">
+                      ${info.type}
+                      <span class="ml-2 px-2 py-1 rounded-full text-xs ${getLogTypeColorClass(info.type)}">${info.type}</span>
+                    </td>
+                    <td class="px-6 py-4 border-b border-gray-200 text-sm text-gray-700">${info.action}</td>
+                    <td class="px-6 py-4 border-b border-gray-200 text-sm text-gray-600">${info.detail}</td>
+                    <td class="px-6 py-4 border-b border-gray-200 text-sm text-gray-500">${new Date(info.create_time).toLocaleString()}</td>
+                    <td class="px-6 py-4 border-b border-gray-200 text-sm text-center">
+                      <button onclick="viewInfoDetail(${info.id})" class="text-blue-500 hover:text-blue-700">
+                        <i class="fa-solid fa-eye"></i> 详情
+                      </button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+          function getLogTypeColorClass(type) {
+            switch (type) {
+              case '管理员': return 'bg-blue-100 text-blue-600';
+              case '商品': return 'bg-green-100 text-green-600';
+              case '用户': return 'bg-purple-100 text-purple-600';
+              case '订单': return 'bg-yellow-100 text-yellow-600';
+              default: return 'bg-gray-100 text-gray-600';
+            }
+          }
+
+          document.getElementById('content').innerHTML = '';
+          document.getElementById('content').appendChild(infoList);
+        }
+      } catch (error) {
+        console.error(error);
+        document.getElementById('content').innerHTML = '<h2>操作日志</h2><p class="text-gray-600">加载日志失败</p>';
+      }
+      if (activeItem) {
+        activeItem.classList.remove('sidebar-active');
+      }
+      const dashboardItem = document.querySelector('li[onclick="loadInfos()"]');
+      dashboardItem.classList.add('sidebar-active');
+      activeItem = dashboardItem;
+
+    }
+
+    async function saveUser(userId) {
+      const email = document.getElementById('editEmail').value;
+      const name = document.getElementById('editName').value;
+      const phone = document.getElementById('editPhone').value;
+
+      try {
+        const response = await fetch('/api/updateUser', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ userId, email, name, phone })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          alert('用户信息更新成功');
+          loadUsers();
+        } else {
+          alert(data.message);
+        }
+      } catch (error) {
+        console.error(error);
+        alert('更新失败');
+      }
+    }
+    // 显示登录表单并处理下单
+    function showLoginForm(adminPhone, productId, price) {
+      const loginModal = document.createElement('div');
+      loginModal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      `;
+      loginModal.id = 'loginModal';
+
+      loginModal.innerHTML = `
+        <div style="background-color: white; padding: 20px; border-radius: 10px; width: 300px; box-shadow: 0 0 10px rgba(0,0,0,0.3);">
+          <h3 style="margin-top: 0; text-align: center;">用户登录</h3>
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px;">邮箱:</label>
+            <input type="email" id="loginEmail" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" required>
+          </div>
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px;">密码:</label>
+            <input type="password" id="loginPassword" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" required>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button onclick="loginAndCreateOrder('${adminPhone}', ${productId}, ${price})" 
+                    style="flex: 1; padding: 8px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+              登录并下单
+            </button>
+            <button onclick="document.body.removeChild(document.getElementById('loginModal'))"
+                    style="flex: 1; padding: 8px; background-color: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">
+              取消
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(loginModal);
+    }
+
+    // 登录并创建订单
+    async function loginAndCreateOrder(adminPhone, productId, price) {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      // 移除登录模态框
+      document.body.removeChild(document.getElementById('loginModal'));
+
+      try {
+        // 直接使用邮箱密码创建订单（合并登录和下单步骤）
+        const response = await fetch('/api/createOrder', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ adminPhone, email, password, productId })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          alert('订单创建成功！');
+          viewProducts(adminPhone); // 刷新商品列表，显示更新后的库存
+        } else {
+          alert(data.message);
+        }
+      } catch (error) {
+        console.error(error);
+        alert('操作失败，请重试');
+      }
+    }
+  </script>
+      <script src="js/live2d.js"></script>
+    <script>
+       var LAppDefine = 
+       {
+        CANVAS_ID: "live2d",
+        IS_DRAGABLE: true
+       };
+       this.canvas = document.getElementById(LAppDefine.CANVAS_ID);
+       if (this.canvas.addEventListener)
+       {
+            this.canvas.addEventListener("click", mouseEvent, false);
+            this.canvas.addEventListener("mousedown", mouseEvent, false);
+            this.canvas.addEventListener("mouseup", mouseEvent, false);
+            this.canvas.addEventListener("mousemove", mouseEvent, false);
+        }
+        var isDragging = false;
+        var mouseOffsetx = 0;
+        var mouseOffsety = 0;
+        function mouseEvent(e)
+        {
+            e.preventDefault();
+            if (e.type == "mousedown")
+            {
+                if ("button" in e && e.button != 0){
+                    return;
+                }
+                isDragging = true;
+                mouseOffsetx = e.pageX - document.getElementById(LAppDefine.CANVAS_ID).offsetLeft;
+                mouseOffsety = e.pageY - document.getElementById(LAppDefine.CANVAS_ID).offsetTop;
+            }
+            else if (e.type == "mousemove")
+            {
+                if(isDragging == true) {
+                    var movex = e.pageX - mouseOffsetx;
+                    var movey = e.pageY - mouseOffsety;
+                    if(movex > window.innerWidth - document.getElementById(LAppDefine.CANVAS_ID).width)
+                        movex = window.innerWidth - document.getElementById(LAppDefine.CANVAS_ID).width;
+                    if(movex < 0) movex = 0;
+                    if(movey > window.innerHeight - document.getElementById(LAppDefine.CANVAS_ID).height)
+                        movey = window.innerHeight - document.getElementById(LAppDefine.CANVAS_ID).height;
+                    if(movey < 0) movey = 0;
+                    if(LAppDefine.IS_DRAGABLE) {
+                        document.getElementById(LAppDefine.CANVAS_ID).style.left = movex + "px";
+                        document.getElementById(LAppDefine.CANVAS_ID).style.top = movey + "px";
+                    }
+                }
+            }
+            else if (e.type == "mouseup")
+            {
+                if ("button" in e && e.button != 0) return;
+                isDragging = false;
+            }
+        }
+        loadlive2d("live2d", "Pio_live2d/model" + Math.floor(Math.random() * 6) + ".json");
+    </script>
+</body>
+
+</html>

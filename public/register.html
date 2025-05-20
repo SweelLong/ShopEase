@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理员注册 - 商城管理系统</title>
+  <meta name="description" content="商城管理系统，提供便捷的商品管理、订单处理和数据分析功能。">
+  <meta name="keywords" content="商城管理系统，商品管理，订单处理，数据分析">
+  <meta name="author" content="SweelLong">
+  <meta name="copyright" content="Copyright © 2020-2025 SweelLong">
+  <link rel="icon" href="img/favicon.ico">
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <link rel="bookmark" href="img/favicon.ico">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3B82F6',
+            secondary: '#10B981',
+            accent: '#F59E0B',
+            dark: '#1E293B',
+            light: '#F8FAFC'
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .auth-bg {
+        background-image: linear-gradient(135deg, #3B82F6 20%, #2563EB 80%);
+      }
+      .register-card {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border-radius: 15px;
+        background-color: white;
+      }
+      .input-group {
+        position: relative;
+      }
+      .input-group i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6B7280;
+      }
+      .input-group input {
+        padding-left: 3.5rem;
+      }
+      .form-label {
+        display: block;
+        font-size: 0.875rem; /* text-sm */
+        font-weight: 500;    /* font-medium */
+        color: #374151;      /* text-gray-700 */
+        margin-bottom: 0.25rem; /* mb-1 */
+      }
+      .form-input {
+        width: 100%;
+        padding-left: 1rem;  /* px-4 */
+        padding-right: 1rem;
+        padding-top: 0.75rem; /* py-3 */
+        padding-bottom: 0.75rem;
+        border-radius: 0.5rem; /* rounded-lg */
+        border: 1px solid #d1d5db; /* border-gray-300 */
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        color: #111827;
+        background-color: #fff;
+      }
+      .btn-primary {
+        width: 100%;
+        background-color: #3B82F6; /* bg-primary */
+        color: #fff;
+        padding-top: 0.75rem; /* py-3 */
+        padding-bottom: 0.75rem;
+        padding-left: 1.5rem; /* px-6 */
+        padding-right: 1.5rem;
+        border-radius: 0.5rem; /* rounded-lg */
+        transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+        outline: none;
+        border: none;
+        font-size: 1rem;
+        font-weight: 500;
+      }
+      .card-animation {
+        animation: fadeIn 0.5s ease-in-out;
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .password-strength {
+        height: 0.25rem; /* h-1 */
+        border-radius: 9999px; /* rounded-full */
+        transition-property: all;
+        transition-duration: 300ms;
+      }
+    }
+        .live2d
+    {
+      position: fixed;
+      bottom : 0;
+      right : 0;
+      z-index: 9999;
+    }
+  </style>
+</head>
+
+<body class="auth-bg font-inter min-h-screen flex items-center justify-center p-4">
+    <canvas class="live2d" id="live2d" width="400" height="300"></canvas>
+  <div class="container max-w-lg mx-auto">
+    <div class="register-card p-8 card-animation">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="fa fa-user-plus text-primary text-3xl"></i>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-800">管理员注册</h1>
+        <p class="text-gray-500 mt-2">创建您的商城管理账户</p>
+      </div>
+
+      <form id="registerForm" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="lastname" class="form-label">姓氏</label>
+            <div class="input-group">
+              <i class="fa fa-user text-lg"></i>
+              <input type="text" id="lastname" class="form-input" required>
+            </div>
+          </div>
+          <div>
+            <label for="firstname" class="form-label">名字</label>
+            <div class="input-group">
+              <i class="fa fa-user text-lg"></i>
+              <input type="text" id="firstname" class="form-input" required>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label for="email" class="form-label">邮箱</label>
+          <div class="input-group">
+            <i class="fa fa-envelope text-lg"></i>
+            <input type="email" id="email" class="form-input" required>
+          </div>
+        </div>
+
+        <div>
+          <label for="phone" class="form-label">手机号</label>
+          <div class="input-group">
+            <i class="fa fa-phone text-lg"></i>
+            <input type="text" id="phone" class="form-input" required>
+          </div>
+        </div>
+
+        <div>
+          <label for="password" class="form-label">密码</label>
+          <div class="input-group">
+            <i class="fa fa-lock text-lg"></i>
+            <input type="password" id="password" class="form-input" required>
+          </div>
+          <div class="mt-2 flex space-x-1">
+            <div id="strength-1" class="password-strength bg-gray-200 flex-1"></div>
+            <div id="strength-2" class="password-strength bg-gray-200 flex-1"></div>
+            <div id="strength-3" class="password-strength bg-gray-200 flex-1"></div>
+            <div id="strength-4" class="password-strength bg-gray-200 flex-1"></div>
+          </div>
+          <p id="strength-text" class="text-xs text-gray-500 mt-1">密码强度: 未输入</p>
+        </div>
+
+        <div>
+          <label for="confirmPassword" class="form-label">确认密码</label>
+          <div class="input-group">
+            <i class="fa fa-lock text-lg"></i>
+            <input type="password" id="confirmPassword" class="form-input" required>
+          </div>
+          <p id="password-match" class="text-xs text-red-500 mt-1 hidden">两次输入的密码不匹配</p>
+        </div>
+
+        <button type="submit" class="btn-primary">
+          注册
+        </button>
+      </form>
+
+      <p class="text-center text-gray-600 mt-6">
+        已有账号? <a href="login.html" class="text-primary hover:text-primary/80 font-medium">立即登录</a>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const lastname = document.getElementById('lastname').value;
+      const firstname = document.getElementById('firstname').value;
+      const email = document.getElementById('email').value;
+      const phone = document.getElementById('phone').value;
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      // 简单验证
+      if (password !== confirmPassword) {
+        document.getElementById('password-match').classList.remove('hidden');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ lastname, firstname, email, phone, password })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          alert('注册成功！');
+          if (confirm('是否现在登录?')) {
+            window.location.href = 'login.html';
+          }
+        } else {
+          alert(data.message);
+        }
+      } catch (error) {
+        console.error('注册错误:', error);
+        alert('注册失败，请检查网络或重试');
+      }
+    });
+
+    // 密码强度检测
+    const passwordInput = document.getElementById('password');
+    const strengthBars = [
+      document.getElementById('strength-1'),
+      document.getElementById('strength-2'),
+      document.getElementById('strength-3'),
+      document.getElementById('strength-4')
+    ];
+    const strengthText = document.getElementById('strength-text');
+
+    passwordInput.addEventListener('input', () => {
+      const password = passwordInput.value;
+      let strength = 0;
+
+      if (password.length >= 8) strength++;
+      if (/[A-Z]/.test(password)) strength++;
+      if (/[a-z]/.test(password)) strength++;
+      if (/[0-9]/.test(password)) strength++;
+      if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+      // 重置所有进度条
+      strengthBars.forEach(bar => {
+        bar.className = 'password-strength bg-gray-200 flex-1';
+      });
+
+      // 设置进度条颜色
+      const colors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-green-500'];
+
+      for (let i = 0; i < strength; i++) {
+        strengthBars[i].className = `password-strength ${colors[Math.min(i, 3)]} flex-1`;
+      }
+
+      // 设置强度文本
+      const strengthLabels = ['非常弱', '弱', '中等', '强', '非常强'];
+      strengthText.textContent = `密码强度: ${strengthLabels[Math.min(strength, 4)]}`;
+
+      // 检查密码匹配
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      if (confirmPassword) {
+        document.getElementById('password-match').classList.toggle(
+          'hidden',
+          password === confirmPassword
+        );
+      }
+    });
+
+    // 确认密码检查
+    document.getElementById('confirmPassword').addEventListener('input', () => {
+      const password = passwordInput.value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      document.getElementById('password-match').classList.toggle(
+        'hidden',
+        password === confirmPassword
+      );
+    });
+  </script>
+      <script src="js/live2d.js"></script>
+    <script>
+       var LAppDefine = 
+       {
+        CANVAS_ID: "live2d",
+        IS_DRAGABLE: true
+       };
+       this.canvas = document.getElementById(LAppDefine.CANVAS_ID);
+       if (this.canvas.addEventListener)
+       {
+            this.canvas.addEventListener("click", mouseEvent, false);
+            this.canvas.addEventListener("mousedown", mouseEvent, false);
+            this.canvas.addEventListener("mouseup", mouseEvent, false);
+            this.canvas.addEventListener("mousemove", mouseEvent, false);
+        }
+        var isDragging = false;
+        var mouseOffsetx = 0;
+        var mouseOffsety = 0;
+        function mouseEvent(e)
+        {
+            e.preventDefault();
+            if (e.type == "mousedown")
+            {
+                if ("button" in e && e.button != 0){
+                    return;
+                }
+                isDragging = true;
+                mouseOffsetx = e.pageX - document.getElementById(LAppDefine.CANVAS_ID).offsetLeft;
+                mouseOffsety = e.pageY - document.getElementById(LAppDefine.CANVAS_ID).offsetTop;
+            }
+            else if (e.type == "mousemove")
+            {
+                if(isDragging == true) {
+                    var movex = e.pageX - mouseOffsetx;
+                    var movey = e.pageY - mouseOffsety;
+                    if(movex > window.innerWidth - document.getElementById(LAppDefine.CANVAS_ID).width)
+                        movex = window.innerWidth - document.getElementById(LAppDefine.CANVAS_ID).width;
+                    if(movex < 0) movex = 0;
+                    if(movey > window.innerHeight - document.getElementById(LAppDefine.CANVAS_ID).height)
+                        movey = window.innerHeight - document.getElementById(LAppDefine.CANVAS_ID).height;
+                    if(movey < 0) movey = 0;
+                    if(LAppDefine.IS_DRAGABLE) {
+                        document.getElementById(LAppDefine.CANVAS_ID).style.left = movex + "px";
+                        document.getElementById(LAppDefine.CANVAS_ID).style.top = movey + "px";
+                    }
+                }
+            }
+            else if (e.type == "mouseup")
+            {
+                if ("button" in e && e.button != 0) return;
+                isDragging = false;
+            }
+        }
+        loadlive2d("live2d", "Pio_live2d/model" + Math.floor(Math.random() * 6) + ".json");
+    </script>
+</body>
+
+</html>
