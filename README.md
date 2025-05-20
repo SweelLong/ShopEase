@@ -1,5 +1,6 @@
 # ShopEase - 基于Node.js的商城管理系统
 > 轻量级电商管理解决方案，前后端分离架构，支持商品管理、订单处理及数据可视化分析
+> ---
 > 大一计科蒟蒻的数据库期末课设的设计与实现
 
 ## 项目信息
@@ -88,7 +89,7 @@ ShopEase 是基于 **Node.js** 开发的轻量级商城管理系统，面向中�
 ## 交互与视觉设计
 1. **响应式布局**  
    - Tailwind CSS 类实现动态布局切换：  
-     - 移动端：`grid-cols-1`（单列）  
+     - 移动端：`grid-cols-1`（单列）  【未完善】（可能会有意料之外的问题）
      - 桌面端：`md:grid-cols-2` / `lg:grid-cols-4`（多列）  
 
 2. **动态反馈**  
@@ -98,6 +99,22 @@ ShopEase 是基于 **Node.js** 开发的轻量级商城管理系统，面向中�
 3. **Live2D 角色互动**  
    - 动作库：Idle、Touch Dere、WakeUp 等  
    - 交互逻辑：点击屏幕触发角色动作，参数通过 `.mtn` 文件控制  
+
+## 效果展示 
+![BE7B32912C0123675CA48F770739E825](https://github.com/user-attachments/assets/92ec7a35-f9be-4a5b-92d1-8e4afe39a5ac)
+![91813516251A5071A0F2D4074949D2BF](https://github.com/user-attachments/assets/f990601c-a896-42eb-8c6d-83da94c99c4c)
+![01025DD038BF49EDFAE2DC5CDC031937](https://github.com/user-attachments/assets/6ea3a166-2a55-4151-a859-81f5892c50e9)
+![D90EC01866E0125ED563481CA4F9EBB2](https://github.com/user-attachments/assets/cd270009-72fe-4d4e-888a-5589aa8ce958)
+![68347BC294BA7237D11FD7EF614DD9D7](https://github.com/user-attachments/assets/5a1c5696-f506-4346-84b3-db69120971a4)
+![FD4AEA339B6FFF0DF98EEC4FBFA34D4D](https://github.com/user-attachments/assets/2bc317da-9934-4c3e-8942-7d421715b699)
+![1DCFD15A3F6C6613502BDB218616C3EC](https://github.com/user-attachments/assets/946b526f-1bc0-4ac1-9b7b-9b42ef444082)
+![ACE5D2B4B610BC3B167BA9AE782FA33D](https://github.com/user-attachments/assets/8590efe6-aa8e-4ffb-815b-a1a89dd6ed7a)
+![C7B70C1135512AE7743A6839673CB459](https://github.com/user-attachments/assets/b423a16c-1aa9-4b6b-8fd5-e652f27a4d0d)
+![2973E293974726E4D74611F30F0553ED](https://github.com/user-attachments/assets/14b478d6-b506-4bc2-bb2e-bcfc45c23ea6)
+![715BA2913C8BD5CF8EBC2139C4C85A99](https://github.com/user-attachments/assets/1dc31b97-937e-4768-a54d-3990e1244b9a)
+![2AE24B39B12D0A3079A907A144B991E4](https://github.com/user-attachments/assets/99fc56e8-f8e8-4426-9497-26aca880bb1c)
+![4649D6C1A0A97641B321A219B31DC0C6](https://github.com/user-attachments/assets/ab665523-f1b6-48c4-8ddb-4932c2660c3a)
+![EF9C2EC0054D3329CF7E7BFCBD160FA6](https://github.com/user-attachments/assets/b021bb60-dba0-4a44-b7a1-988d2774ee21)
 
 
 ## 部署指南
